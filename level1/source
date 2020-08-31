@@ -1,0 +1,10 @@
+void run(void) {
+	write("Good... Wait what?");
+	system("/bin/sh");
+}
+
+int main(void) {
+	char get[80];
+	gets(get);
+	return 0;
+}
