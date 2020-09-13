@@ -1,7 +1,6 @@
 # Level 0
 
-Lorsqu'on lance le binaire `level0` sans argument, le programme segfault. Avec différent argument le programme nous répond "No !"
-
+Lorsqu'on lance le binaire `level0` sans argument, le programme segfault. Avec différents arguments, le programme nous répond "No !" :
 ```shell
 ~ ./level0
 Segmentation fault (core dumped)
@@ -11,8 +10,7 @@ No !
 No !
 ```
 
-Vu qu'il segfault sans argument, je peux regarder avec gdb à quel instruction il segfault.
-
+Vu qu'il segfault sans argument, je peux regarder avec gdb à quelle instruction il segfault :
 ```shell
 ~ gdb level0
 [...]
@@ -28,8 +26,7 @@ Program received signal SIGSEGV, Segmentation fault.
 #3  0x08048ed9 in main ()
 ```
 
-En examinant de plus près le code on peut voir qu'il segfault au niveau d'un `atoi` pas protéger, il execute `atoi` en lui passant le premier argument et compare la sortie d'`atoi` pour savoir si il est égal à `0x1a7` soit `423` en décimal.
-
+En examinant de plus près le code on peut voir qu'il segfault au niveau d'un [`atoi`](https://linux.die.net/man/3/atoi) non protégé. Il exécute `atoi` en lui passant le premier argument et compare la sortie d'`atoi` pour savoir si il est égal à `0x1a7` (soit `423` en décimal).
 ```
 (gdb) disassemble main
 Dump of assembler code for function main:
@@ -43,10 +40,8 @@ Dump of assembler code for function main:
 End of assembler dump.
 ```
 
-Si le retour d'`atoi` est bien égal à 423 alors, le programme éxecute `/bin/sh` avec l'user `level1`
-
-Il ne nous reste plus donc à executer le programme avec pour argument `423`
-
+Si le retour d'`atoi` est bien égal à 423, alors le programme exécute `/bin/sh` avec l'utilisateur `level1`.  
+Il ne nous reste donc plus qu'à exécuter le programme avec pour argument `423` :
 ```shell
 level0@RainFall:~$ ls -la level0
 -rwsr-x---+ 1 level1 users 747441 Mar  6  2016 level0

