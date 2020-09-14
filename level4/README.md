@@ -1,10 +1,8 @@
 # Level 4
 
-Ce niveau est très similaire au niveau précédent cependant ici la fonction system fait un `cat` du pass du level5 directement.
-
-En examinant l'asm cette fois-ci `m` doit contenir la valeur `0x1025544` soit `16930116` en décimal mais `fgets` ne prend que `512` charactères.
-
-Mais avec `printf` peut crée un padding de charactère sans pour autant dépassé `512` charactères.
+Ce niveau est très similaire au [niveau précédent](/level3/README.md). Cependant ici la fonction `system` fait directement un `cat` du fichier `.pass` de l'utilisateur level5.  
+En examinant l'asm, `m` doit contenir la valeur `0x1025544` (soit 16930116 en décimal). La variable `m` se situe à l'adresse `08049810` (soit `\x10x98\x04\x08` en *little-endian*).  
+`fgets` ne prend que 512 caractères, mais avec `printf` on peut créer un padding suffisant sans pour autant dépasser 512 caractères.
 
 ```sh
 ~ gdb level4
@@ -33,4 +31,3 @@ BBBB b7ff26b0 bffff654 b7fd0ff4 0 0 bffff618 804848d bffff410 200 b7fd1ac0 b7ff3
 [...]
 0f99ba5e9c446258a69b290407a6c60859e9c2d25b26575cafc9ae6d75e9456a
 ```
-

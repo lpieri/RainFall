@@ -1,14 +1,13 @@
 # Level 5
 
-Ce niveau ressemble aux deux précédentes à la différence c'est qu'après le `printf` il appel la function `exit`.
+Ce niveau ressemble aux deux précédents, à la différence qu'après le `printf` il appelle la function `exit`.  
+En examinant l'asm on peut voir qu'il y a une fonction `o` pas utilisée, qui appelle `system("/bin/sh")`.
 
-En examinant l'asm on peut voir qu'il y a une fonction `o` pas utilisé, qui appel `system("/bin/sh")`.
+Quand on reverse `exit`, on voit que la function fait en réalité un `jmp` à une adresse. L'idée de notre exploit sera donc de modifier l'adresse du jump d'exit (dans la [*Global Offset Table*](https://en.wikipedia.org/wiki/Global_Offset_Table)) par l'adresse de la fonction `o`.  
+`objdump -TR level5` nous donne l'adresse de `exit()` => `08049838`. `objdump -t level5 | grep o` nous donne l'adresse de `o` => `080484a4`.  
 
-Quand on reverse `exit` la function fait en réalité un `jmp` à une adresse, l'idée ici est de modifié l'adresse du jump d'exit par l'adresse de la fonction `o`.
-
-Les adresses du programme commence toute par `0x0804` nous avons donc a modifié qu'une partie de l'adresse grâce à `printf`.
-
-La partie que nous devons réecrire est donc `84a4` soit `33956` en décimal.
+Les adresses du programme commençant toutes par `0x0804`, nous n'avons donc à modifier qu'une partie de l'adresse grâce à `printf`.  
+La partie que nous devons réécrire est donc `84a4` (soit 33956 en décimal).
 
 ```shell
 ~ gdb level5
@@ -60,4 +59,3 @@ End of assembler dump.
 cat /home/user/level6/.pass
 d3b7bf1025225bd715fa8ccb54ef06ca70b9125ac855aeab4878217177f41a31
 ```
-

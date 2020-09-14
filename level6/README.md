@@ -1,12 +1,15 @@
 # Level 6
 
-En décompilant le main du binaire, nous voyons qu'il fait appel à deux malloc à la suite un premier de `64` octets et un deuxième de `4` octets.
+En décompilant le main du binaire, nous voyons qu'il fait appel à deux [`malloc`](https://linux.die.net/man/3/malloc) à la suite : un premier de 64 octets et un second de 4 octets.  
+Le premier malloc sera utilisé pour copier `argv[1]` et le deuxième contiendra l'addresse de la fonction `m` (ce qui en fait un pointeur sur fonction), qui sera appellée après le `strcpy`.  
+On peux aussi s'apercevoir qu'il existe une seconde fonction non utilisée dans le main, la fonction `n`. Cette dernière utilise `system` pour `cat` le fichier `.pass` de l'utilisateur level7.
 
-Le premier malloc sera utilisé pour copié `argv[1]` et le deuxième contiendra l'addresse de la fonction `m` ce qui sera donc un pointeur sur fonction puis appellé après le `strcpy`.
+On va utiliser `strcpy` pour copier `argv[1]` dans `dest->buff`. Le [manuel de `strcpy`](https://linux.die.net/man/3/strcpy) nous informe d'une faille :
+>If the destination string of a strcpy() is not large enough, then anything might happen. Overflowing fixed-length string buffers is a favorite cracker technique for taking complete control of the machine. Any time a program reads or copies data into a buffer, the program first needs to check that there's enough space.
 
-On peux aussi s'appercevoir qu'il existe une seconde fonction non utilisé dans le main, la fonction `n`. Cette dernière utilise `system` pour `cat` le pass du level7.
+On devrait donc pouvoir utiliser un [*heap overflow*](https://en.wikipedia.org/wiki/Heap_overflow).
 
-On peut alors réecrire le pointeur sur fonction avec l'adresse de la fonction `n` en copiant `64` octets + `8` de métadata du malloc pour copié ensuite l'adresse de `n` dans le pointeur sur fonction.
+On peut alors réécrire le pointeur sur fonction avec l'adresse de la fonction `n` (`0x8048454`) en copiant 64 octets + 8 octets de métadonnées du malloc pour copier ensuite l'adresse de `n` dans le pointeur sur fonction.
 
 ```shell
 level6@RainFall:~$ gdb level6
@@ -55,6 +58,3 @@ End of assembler dump.
 ~ ./level6 $(python -c 'print "B"*72 + "\x54\x84\x04\x08"')
 f73dcb7a06f60e3ccc608990b0a046359d42a1a0489ffeefd0d9cb2d7c9cb82d
 ```
-
-
-
