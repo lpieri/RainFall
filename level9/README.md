@@ -1,10 +1,11 @@
 # Level 9
 
-Quand on lance `level9` avec gdb et qu'on décompile on peut voir que le programme est écrit en C++. Le programme prend `argv[1]` et le memcpy et nous pouvons voir que ça segfault.
+Quand on lance `level9` avec gdb et qu'on décompile, on peut voir que le programme est écrit en C++.  Ça peut aussi se vérifier avec `objdump -T level9` : on trouvera la librairie standard C++ (`GLIBCXX_3.4`) en plus de la librairie standard C (`GLIBC_2.0`).  
 
-Lorsque nous testons nous pouvons voir que le ça segfault à partir de 108 caractère.
+Le programme prend `argv[1]` et le `memcpy` et nous pouvons voir que ça segfault à partir de 108 caractères. Le crash se produit à l'adresse `0x08048682`, ce qui correspond à la ligne `0x08048682 <+142>:	mov    (%eax),%edx` (juste après l'appel à `setAnnotation`), au transfert du contenu du registre `eax` vers `edx`. Quelques lignes plus loin (`main<+159>`), on a une instruction `call edx`.  
+Si nous écrivons `"B"*112,` l'adresse du registre `eax` au moment du segfault sera `0x42424242` ; idem pour le registre `ecx`. On a donc la main sur `eax` et `ecx`, et potentiellement sur `edx` si l'on parvient à lui transmettre un pointeur valide. Cela nous permettrait de *jump* où nous voulons.
 
-Si nous ecrivons `112 B` l'adresse du registre eax au moment du segfault sera `0x42424242`, nous pouvons alors jump ou nous voulons. Notre but est donc d'écrire le shellcode, padder, et jump à l'adresse du memcpy pour exécuter le shellcode.
+Notre but est donc d'écrire le *shellcode*, ajouter le *padding* nécessaire, et *jump* à l'adresse du `memcpy` pour exécuter le *shellcode*.  
 
 ```shell
 ~ gdb level9
@@ -55,8 +56,3 @@ bonus0
 $ cat /home/user/bonus0/.pass
 f3f0004b6f364cb5a4147e9ef827fa922a4861408845c26b6971ad770d906728
 ```
-
-
-
-
-

