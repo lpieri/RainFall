@@ -7,7 +7,8 @@ void run(void) {
 }
 
 int main(void) {
-	char get[80];
+	char get[76];
+
 	gets(get);
 	return 0;
 }

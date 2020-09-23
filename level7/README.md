@@ -7,7 +7,7 @@ En examinant le code, on peut voir qu'il `malloc` 2 structures et copie les `arg
    1. Avec le premier `strcpy`, nous pouvons réecrire l'addresse du pointeur de la deuxième structure par celle de la fonction `puts` et copier à cette adresse celle de notre fonction `m`.
       - `objdump -R level7` nous apprend que `puts` est à l'adresse `08049928` dans la [*Global Offset Table*](https://en.wikipedia.org/wiki/Global_Offset_Table).
       - L'allocation mémoire sur la *heap* est continue. On sait que le malloc d'une `struct level7` pèse 8 octets (un simple `disas main` depuis `gdb` suffit pour le confirmer).
-      - Le premier `strcpy` écrit dans `structOne->*buffer` ; le second va écrire dans `structOne->*buffer`. Le but de notre premier exploit est d'écraser le contenu de `structTwo->buffer` pour modifier l'adresse où le contenu de `argv[2]` sera copié. Il nous faudra 20 octets de remplissage avant d'écrire l'adresse de `puts` dans `structTwo->buffer`.
+      - Le premier `strcpy` écrit dans `structOne->*buffer` ; le second va écrire dans `structTwo->*buffer`. Le but de notre premier exploit est d'écraser le contenu de `structTwo->buffer` pour modifier l'adresse où le contenu de `argv[2]` sera copié. Il nous faudra 20 octets de remplissage avant d'écrire l'adresse de `puts` dans `structTwo->buffer`.
       - Notre premier exploit sera donc la forme : `python -c 'print "B"*20 + "\x28\x99\x04\x08"'`.
    2. Avec le second `strcpy`, nous allons placer l'adresse de la fonction `m`, de façon à ce qu'au moment d'appeller `puts`, ce soit en fait `m` qui soit appellée et exécutée.
       - Avec `gdb`, on détermine l'adresse de `m` : `0x80484f4`.

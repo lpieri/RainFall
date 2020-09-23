@@ -1,17 +1,30 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
-void run(void)
+void p(void)
 {
-    fwrite("Good... Wait what?\n",1,19,stdout);
-    system("/bin/sh");
+    unsigned int ret;
+    char buffer[76];
+    
+    fflush(stdout);
+    gets(buffer);
+    ret = __builtin_return_address(0);
+    
+    if ((ret & 0xb0000000) == 0xb0000000) {
+        printf("(%p)\n",ret);
+                        /* WARNING: Subroutine does not return */
+        _exit(1);
+    }
+    
+    puts(buffer);
+    strdup(buffer);
     return;
 }
 
 void main(void)
 {
-    char buff [76];
-    
-    gets(buff);
+    p();
     return;
 }
