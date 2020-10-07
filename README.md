@@ -6,7 +6,7 @@ Second projet de la branche sécurité de 42 Born2Code.
 
 ## Note
 
-125/100
+**125**/100
 
 ## Sommaire
 
