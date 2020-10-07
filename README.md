@@ -38,7 +38,7 @@ Second projet de la branche sécurité de 42 Born2Code.
 
 [bonus 3](/bonus3/)
 
-## Contributeur
+## Contributeurs
 
 [Vincent Schlumberger](https://github.com/vischlum)
 
